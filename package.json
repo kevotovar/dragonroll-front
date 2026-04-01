@@ -1,0 +1,33 @@
+{
+  "name": "woonuxt",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev --host 0.0.0.0",
+    "dev:ssl": "NODE_TLS_REJECT_UNAUTHORIZED=0 nuxt dev --host 0.0.0.0 --https --ssl-cert localhost.pem --ssl-key localhost-key.pem",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "serve": "nuxi generate && npx serve .output/public -l 8080",
+    "typecheck": "nuxi typecheck"
+  },
+  "dependencies": {
+    "@nuxtjs/color-mode": "^4.0.0",
+    "@stripe/stripe-js": "^8.11.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@vueuse/core": "^14.2.1",
+    "reka-ui": "^2.9.2",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "@iconify-json/ion": "^1.2.7",
+    "@nuxt/icon": "^2.2.1",
+    "@nuxt/image": "2.0.0",
+    "@nuxtjs/i18n": "^10.2.4",
+    "@tailwindcss/typography": "^0.5.19",
+    "nuxt": "^4.4.2",
+    "nuxt-graphql-client": "^0.2.46",
+    "prettier": "^3.8.1"
+  }
+}

@@ -1,0 +1,104 @@
+<script setup lang="ts">
+import type { ImageFragment, Product, Variation } from '#types/gql';
+
+const { FALLBACK_IMG } = useHelpers();
+
+type Gallery = { nodes: ImageFragment[] };
+
+const props = defineProps({
+  mainImage: { type: Object as PropType<ImageFragment>, required: true },
+  gallery: { type: Object as PropType<Gallery>, required: true },
+  node: { type: Object as PropType<Product | Variation>, required: true },
+  activeVariation: { type: Object as PropType<Variation | null>, required: false },
+});
+
+const primaryImage = computed<ImageFragment>(() => ({
+  sourceUrl: props.mainImage.sourceUrl || FALLBACK_IMG,
+  title: props.mainImage.title,
+  altText: props.mainImage.altText,
+  databaseId: props.mainImage.databaseId,
+}));
+
+const imageToShow = ref<ImageFragment>(primaryImage.value);
+
+const galleryImages = computed<ImageFragment[]>(() => {
+  // Add the primary image to the start of the gallery and remove duplicates
+  return [primaryImage.value, ...(props.gallery.nodes || [])].filter((img, index, self) => index === self.findIndex((t) => t?.databaseId === img?.databaseId));
+});
+
+const changeImage = (image: ImageFragment) => {
+  if (image) imageToShow.value = image;
+};
+
+watch(
+  () => props.activeVariation,
+  (newVal) => {
+    if (newVal?.image) {
+      const foundImage = galleryImages.value.find((img) => img.sourceUrl && img.sourceUrl === newVal.image?.sourceUrl);
+      if (foundImage) imageToShow.value = foundImage;
+    }
+  },
+);
+
+const imgWidth = 640;
+</script>
+
+<template>
+  <div>
+    <SaleBadge :node class="absolute text-base top-4 right-4" />
+    <NuxtImg
+      class="rounded-xl object-contain w-full min-w-87.5"
+      :width="imgWidth"
+      :height="imgWidth"
+      :alt="imageToShow.altText || node.name"
+      :title="imageToShow.title || node.name"
+      :src="imageToShow.sourceUrl || FALLBACK_IMG"
+      :preload="{ fetchPriority: 'high' }"
+      placeholder
+      placeholder-class="blur-xl" />
+    <div v-if="gallery.nodes.length" class="my-4 gallery-images">
+      <NuxtImg
+        v-for="galleryImg in galleryImages"
+        :key="galleryImg.databaseId"
+        class="cursor-pointer rounded-xl"
+        :width="imgWidth"
+        :height="imgWidth"
+        :src="galleryImg.sourceUrl || FALLBACK_IMG"
+        :alt="galleryImg.altText || node.name"
+        :title="galleryImg.title || node.name"
+        placeholder
+        placeholder-class="blur-xl"
+        loading="lazy"
+        @click.native="changeImage(galleryImg)" />
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.gallery-images {
+  display: flex;
+  overflow: auto;
+  gap: 1rem;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.gallery-images img {
+  width: 72px;
+  aspect-ratio: 5/6;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .gallery-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+
+    img {
+      width: 100%;
+    }
+  }
+}
+</style>

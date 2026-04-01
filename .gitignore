@@ -1,0 +1,35 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+.github/
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
+
+# vscode config
+.vscode
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Local Netlify folder
+.netlify
+
+*.pem
+
+woonuxt-settings

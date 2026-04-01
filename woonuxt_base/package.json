@@ -1,0 +1,9 @@
+{
+  "name": "woonuxt",
+  "version": "4.15.2",
+  "main": "./nuxt.config.ts",
+  "type": "module",
+  "imports": {
+    "#tailwind": "./app/assets/css/main.css"
+  }
+}
