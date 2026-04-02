@@ -35,14 +35,6 @@ const createStripeElements = async () => {
       paymentElement = elements.create('payment', {
         layout: 'tabs',
         paymentMethodOrder: ['card', 'apple_pay', 'google_pay', 'paypal'],
-        fields: {
-          billingDetails: {
-            name: 'auto',
-            email: 'auto',
-            phone: 'never',
-            address: 'never',
-          },
-        },
         wallets: {
           applePay: 'auto',
           googlePay: 'auto',
