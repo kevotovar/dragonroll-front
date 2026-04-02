@@ -1,0 +1,117 @@
+# =============================================================================
+# DragonRoll Frontend - Docker Compose Configuration
+# =============================================================================
+#
+# This file defines the Docker Compose service for the dragonroll-front
+# Nuxt.js application. It provides easy orchestration for local development
+# and production deployment.
+#
+# Prerequisites:
+#   - Docker Engine 20.10+
+#   - Docker Compose 2.0+
+#   - A valid .env file with all required environment variables
+#   - A LIVE WordPress GraphQL endpoint accessible during build
+#
+# Usage:
+#   # Build and start the service
+#   docker-compose up --build -d
+#
+#   # View logs
+#   docker-compose logs -f app
+#
+#   # Stop the service
+#   docker-compose down
+#
+#   # Restart the service
+#   docker-compose restart
+#
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # Application Service
+  # ===========================================================================
+  app:
+    # Build configuration
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      # Pass all environment variables as build arguments
+      # These are embedded into the application during build
+      args:
+        - GQL_HOST=${GQL_HOST}
+        - NUXT_IMAGE_DOMAINS=${NUXT_IMAGE_DOMAINS}
+        - APP_HOST=${APP_HOST:-http://localhost:3000}
+        - CATALOG_ISR_TTL=${CATALOG_ISR_TTL:-3600}
+        - NUXT_PUBLIC_PRODUCTS_PER_PAGE=${NUXT_PUBLIC_PRODUCTS_PER_PAGE:-24}
+        - NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NUXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        - PRIMARY_COLOR=${PRIMARY_COLOR:-#ff0000}
+
+    # Container name for easier reference
+    container_name: dragonroll-front
+
+    # Image tag for the built image
+    image: dragonroll-front:latest
+
+    # Port mapping - expose the application on port 3000
+    ports:
+      - "3000:3000"
+
+    # Load environment variables from .env file
+    # Note: These are not used by the running app (vars are baked in at build)
+    # but they help with documentation and future extensibility
+    env_file:
+      - .env
+
+    # Environment variables for runtime
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+
+    # Health check configuration
+    # Verifies the application is responding to HTTP requests
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    # Restart policy - automatically restart unless manually stopped
+    restart: unless-stopped
+
+    # Security settings
+    security_opt:
+      - no-new-privileges:true
+
+    # Read-only root filesystem for enhanced security
+    read_only: true
+
+    # Temporary filesystem for writable locations
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+
+    # Resource limits (uncomment if needed)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 512M
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 256M
+
+# =============================================================================
+# Networks (optional - for multi-service setups)
+# =============================================================================
+# networks:
+#   dragonroll-network:
+#     driver: bridge
+
+# =============================================================================
+# Volumes (optional - for persistent data)
+# =============================================================================
+# volumes:
+#   dragonroll-data:
