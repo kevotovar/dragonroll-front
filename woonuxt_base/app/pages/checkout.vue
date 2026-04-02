@@ -115,7 +115,7 @@ const payNow = async () => {
               billing_details: {
                 name: `${customer.value?.billing?.firstName || ''} ${customer.value?.billing?.lastName || ''}`.trim() || undefined,
                 email: customer.value?.billing?.email || undefined,
-                phone: customer.value?.billing?.phone || undefined,
+                ...(customer.value?.billing?.phone ? { phone: customer.value.billing.phone } : {}),
                 address: {
                   line1: customer.value?.billing?.address1 || undefined,
                   line2: customer.value?.billing?.address2 || undefined,
